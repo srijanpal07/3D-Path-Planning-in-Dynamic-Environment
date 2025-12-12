@@ -40,7 +40,7 @@ The system supports:
 
 You can use either Python venv or Conda. Both instructions are provided below.
 
-### Option A — Using Python venv (recommended)
+### Option A - Using Python venv (recommended)
 
 ```
 python3 -m venv .venv
@@ -53,7 +53,7 @@ Check installation:
 python -c "import numpy, plotly; print('OK')"
 ```
 
-### Option B — Using Conda
+### Option B - Using Conda
 ```
 conda create -n path3d python=3.10
 conda activate path3d
@@ -61,7 +61,7 @@ pip install -r requirements.txt
 ```
 
 ## 3. Running the Code
-### Step 1 (optional) — Generate an Environment
+### Step 1 (optional) - Generate an Environment
 
 This script creates the environment, writes a JSON config into the scenes/ folder, and also produces a preview visualization (viz.html).
 
@@ -75,7 +75,7 @@ scenes/baseline_env.json   # environment only
 viz.html                   # optional preview
 ```
 
-### Step 2 (Main) — Load Environment + Plan Path + Visualize
+### Step 2 (Main) - Load Environment + Plan Path + Visualize
 
 This script loads a saved JSON environment, runs a planner from start to goal, and outputs a full animation showing obstacles + trajectory + probe motion (from start to goal).
 
