@@ -11,6 +11,7 @@ The system supports:
 
 ## 1. Project Structure
 
+```
 3D-Path-Planning-in-Dynamic-Environment/
 │
 ├── examples/
@@ -32,6 +33,7 @@ The system supports:
 │
 ├── requirements.txt
 └── README.md
+```
 
 
 ## 2. Setup Instructions
