@@ -3,24 +3,20 @@ plan_and_visualize.py
 
 Load Environment -> Run Planner -> Visualize
 
-This script loads a saved environment configuration (EnvironmentConfig),
-reconstructs the static and dynamic obstacles, and builds a GridWorld
+This script loads a saved environment configuration from a JSON file,
+reconstructs the static and dynamic obstacles, and builds a 3D occupancy grid
 used for planning.
 
 It then:
-  - runs a chosen planner (currently 3D A* for the baseline)
+  - runs a chosen planner (currently 3D A* as baseline)
   - converts the resulting grid-level path into world coordinates
   - generates a time-indexed Scenario with:
         * moving dynamic obstacles
-        * the static environment
-        * the precomputed A* trajectory
-        * the probe moving along this trajectory
+        * static environment
+        * precomputed A* trajectory
+        * probe moving along this trajectory
 
-Finally, the script produces an interactive HTML visualization
-(showing obstacles, the probe, and the planned path).
-
-This script is intended for evaluating path planning algorithms on
-previously saved environments.
+Finally, the script produces an interactive HTML visualization.
 
 Outputs:
   - baseline_viz.html

@@ -89,7 +89,6 @@ def _obstacle_traces(ob: Obstacle) -> List:
 
 def _start_goal_marker(p: Vec3, color: str, label: str) -> go.Scatter3d:
     x, y, z = p
-    z_lift = z + 0.2   # lift so it’s not buried in the grid
 
     # Use symbols that are valid for 3D markers in Plotly
     if label.upper() == "START":
@@ -98,7 +97,7 @@ def _start_goal_marker(p: Vec3, color: str, label: str) -> go.Scatter3d:
         symbol = "diamond-open"   # outlined diamond for GOAL
 
     return go.Scatter3d(
-        x=[x], y=[y], z=[z_lift],
+        x=[x], y=[y], z=[z],
         mode="markers+text",
         name=label,
         marker=dict(
@@ -120,7 +119,7 @@ def _probe_marker(p: Vec3) -> go.Scatter3d:
     return go.Scatter3d(
         x=[p[0]], y=[p[1]], z=[p[2]],
         mode="markers",
-        name="probe",
+        name="Probe",
         marker=dict(
             size=9,
             symbol="circle",
@@ -128,7 +127,7 @@ def _probe_marker(p: Vec3) -> go.Scatter3d:
             line=dict(width=2, color="white"),  # thin outline
             opacity=1.0,
         ),
-        showlegend=False,
+        showlegend=True, # False,
     )
 
 
@@ -146,23 +145,13 @@ def _path_trace(path: List[Vec3], color: str, name: str,
 
 def _legend_line(color: str, name: str) -> go.Scatter3d:
     return go.Scatter3d(
-        x=[], y=[], z=[],
+        x=[0], y=[0], z=[0],
         mode="lines",
         line=dict(width=3, color=color),
         name=name,
         showlegend=True,
+        visible="legendonly",
     )
-
-
-def _legend_probe_marker() -> go.Scatter3d:
-    return go.Scatter3d(
-        x=[], y=[], z=[],
-        mode="markers",
-        marker=dict(size=6, symbol="diamond", color=PROBE_COLOR),
-        name="probe",
-        showlegend=True,
-    )
-
 
 # ---------------------- main entry ----------------------
 
@@ -187,12 +176,12 @@ def visualize_scenario(scn: Scenario, outfile: str = "viz.html") -> str:
 
         # Planned path from this frame
         if fr.planned_path:
-            frame_traces.append(_path_trace(fr.planned_path, PATH_COLOR, "planned path"))
+            frame_traces.append(_path_trace(fr.planned_path, PATH_COLOR, "Planned Trajectory"))
 
         # Probe + tail (executed path)
         if fr.probe:
             probe_tail.append(fr.probe)
-            frame_traces.append(_path_trace(probe_tail, TAIL_COLOR, "executed path", width=2))
+            frame_traces.append(_path_trace(probe_tail, TAIL_COLOR, "Traversed Trajectory", width=2))
             frame_traces.append(_probe_marker(fr.probe))
 
         frames.append(go.Frame(data=frame_traces, name=f"{fr.t:.2f}s"))
@@ -207,10 +196,9 @@ def visualize_scenario(scn: Scenario, outfile: str = "viz.html") -> str:
             frames=frames,
         )
 
-    # Simple legend dummies (optional)
-    fig.add_trace(_legend_line(PATH_COLOR, "planned path"))
-    fig.add_trace(_legend_line(TAIL_COLOR, "executed path"))
-    fig.add_trace(_legend_probe_marker())
+    # Simple legend dummies
+    fig.add_trace(_legend_line(PATH_COLOR, "Planned Trajectory"))
+    fig.add_trace(_legend_line(TAIL_COLOR, "Traversed Trajectory"))
 
     fig.update_layout(
         title=scn.title,

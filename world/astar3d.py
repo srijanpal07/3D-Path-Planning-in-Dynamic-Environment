@@ -1,7 +1,6 @@
 import heapq
 import math
 from typing import Tuple, List, Dict, Set
-
 from world.grid_world import GridWorld, Idx3
 
 
@@ -17,7 +16,7 @@ def _heuristic(idx: Idx3, goal: Idx3, grid: GridWorld) -> float:
 
 def astar_3d(grid: GridWorld, start: Idx3, goal: Idx3) -> List[Idx3]:
     """
-    3D A* on a GridWorld with 6-connected neighbors.
+    3D A* on a GridWorld with 6-connected or 26-connected neighbors.
 
     Returns:
         List of grid indices from start to goal (inclusive).
@@ -55,9 +54,20 @@ def astar_3d(grid: GridWorld, start: Idx3, goal: Idx3) -> List[Idx3]:
             found = True
             break
 
-        # Explore 6-connected neighbors
-        for nbr in grid.neighbors6(current):
-            step_cost = grid.resolution  # all 6 moves are axis-aligned
+        # Explore 6-connected neighbors (Uncomment to use 6-connected)
+        # for nbr in grid.neighbors6(current):
+        #     step_cost = grid.resolution  # all 6 moves are axis-aligned
+        #     tentative_g = g + step_cost
+
+        #     if tentative_g < g_cost.get(nbr, float("inf")):
+        #         g_cost[nbr] = tentative_g
+        #         parent[nbr] = current
+        #         f_new = tentative_g + _heuristic(nbr, goal, grid)
+        #         heapq.heappush(open_heap, (f_new, tentative_g, nbr))
+
+        # Explore 26-connected neighbors
+        for nbr in grid.neighbors26(current):
+            step_cost = grid.resolution  # all 26 moves are axis-aligned
             tentative_g = g + step_cost
 
             if tentative_g < g_cost.get(nbr, float("inf")):

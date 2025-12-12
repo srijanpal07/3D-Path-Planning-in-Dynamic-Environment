@@ -33,9 +33,12 @@ from viz.plotly_viz import visualize_scenario
 from world.env_config import EnvironmentConfig, DynBoxSpec
 from world.env_io import save_env_config
 
-ENV_SAVE_PATH = "environments/baseline_env.json"
+#---------------------- Parameters ----------------------
+ENV_SAVE_PATH = "environments/baseline_env2.json"
+VIZ_TITLE = "Baseline: 3D A* Environment with Static (blue) and Dynamic (orange) Boxes"
 SAVE_VIZ = True  # set to False to skip visualization step
-VIZ_SAVE_PATH = "baseline_viz.html"
+VIZ_SAVE_PATH = "baseline_viz2.html"
+#--------------------------------------------------------
 
 
 def lerp(a, b, t):
@@ -49,7 +52,7 @@ def main():
 
     # ---------- START & GOAL ----------
     start = (1.0, 1.0, 1.0)
-    goal  = (9.0, 9.0, 3.0)
+    goal  = (9.0, 8.0, 2.0) # (9.0, 9.0, 3.0)
 
     # ---------- STATIC BOXES ----------
     static_boxes = [
@@ -183,7 +186,7 @@ def main():
                     )
                 )
             
-            # Follow the precomputed A* path (offline baseline)
+            # Follow the precomputed A* path
             path_pos = int(t * (len(world_path) - 1))
             probe = world_path[path_pos]
             planned = world_path  # show the full A* path
@@ -204,7 +207,7 @@ def main():
             start=start,
             goal=goal,
             frames=frames,
-            title="Baseline: 3D A* Environment with Static (blue) and Dynamic (orange) Boxes",
+            title=VIZ_TITLE,
         )
 
 

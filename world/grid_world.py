@@ -1,8 +1,6 @@
 import math
 from typing import Tuple, List, Sequence, Mapping, Any
-
 import numpy as np
-
 from world.schema import Vec3, Box, Obstacle
 
 Idx3 = Tuple[int, int, int]
@@ -65,6 +63,7 @@ class GridWorld:
         z = zmin + iz * self.resolution
         return (float(x), float(y), float(z))
 
+
     # -------------------------
     # Bounds / occupancy
     # -------------------------
@@ -121,8 +120,10 @@ class GridWorld:
 
         self.occ[ix0 : ix1 + 1, iy0 : iy1 + 1, iz0 : iz1 + 1] = True
 
+
     # -------------------------
-    # Neighbors (6-connected)
+    # Neighbors (6-connected and 26-connected)
+    # Baseline A* uses 6-connected neighbors later increased to 26-connected
     # -------------------------
     def neighbors6(self, idx: Idx3) -> List[Idx3]:
         """
@@ -143,6 +144,23 @@ class GridWorld:
         for j in candidates:
             if self.is_free(j):
                 nbrs.append(j)
+        return nbrs
+    
+    def neighbors26(self, idx: Idx3) -> List[Idx3]:
+        """
+        Return free 26-connected neighbors of idx.
+        Moves: +/-x, +/-y, +/-z (including diagonals).
+        """
+        ix, iy, iz = idx
+        nbrs: List[Idx3] = []
+        for dx in (-1, 0, 1):
+            for dy in (-1, 0, 1):
+                for dz in (-1, 0, 1):
+                    if dx == 0 and dy == 0 and dz == 0:
+                        continue
+                    j = (ix + dx, iy + dy, iz + dz)
+                    if self.is_free(j):
+                        nbrs.append(j)
         return nbrs
 
 
