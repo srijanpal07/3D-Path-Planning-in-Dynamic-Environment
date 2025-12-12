@@ -41,24 +41,85 @@ The system supports:
 You can use either Python venv or Conda. Both instructions are provided below.
 
 ### Option A — Using Python venv (recommended)
+
+```
 python3 -m venv .venv
 source .venv/bin/activate     # On Windows: .venv\Scripts\activate
-
 pip install -r requirements.txt
-
+```
 
 Check installation:
-
-python -c "import numpy, plotly; print('OK')"
-
-## Setup
 ```
-python3 -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+python -c "import numpy, plotly; print('OK')"
+```
+
+### Option B — Using Conda
+```
+conda create -n path3d python=3.10
+conda activate path3d
 pip install -r requirements.txt
 ```
 
-### Run the demo (produces viz.html)
-python3 examples/demo_viz.py
-or
-python3 -m examples.demo_viz
+## 3. Running the Code
+### Step 1 — Generate an Environment (optional)
+
+This script creates the environment, writes a JSON config into the scenes/ folder, and also produces a preview visualization (viz.html).
+
+```
+python -m examples.generate_env
+```
+
+Output:
+```
+scenes/baseline_env.json   # environment only
+viz.html                   # optional preview
+```
+
+### Step 2 — Load Environment + Plan Path + Visualize (Main )
+
+This script loads a saved JSON environment, runs a planner from start to goal, and outputs a full animation showing obstacles + trajectory + probe motion (from start to goal).
+
+```
+python -m examples.plan_and_visualize
+```
+
+Output:
+```
+baseline_viz.html   # full animated visualization
+```
+
+Open the HTML file in any browser to view the scene.
+
+
+## 4. Adding New Planners (optional)
+
+Once the baseline works, you can add new algorithms: D* Lite, RRT / RRT*, Model Predictive Control (MPC), Dynamic re-planning for unknown environments. All planning algorithms only need to operate on:
+
+```
+world/grid_world.py    – occupancy map
+world/schema.py        – geometry + scenario
+```
+
+## 5. Saving & Loading Environments (optional)
+
+Environments are stored as JSON using:
+
+```
+world/env_config.py
+world/env_io.py
+```
+
+A saved file contains:
+
+```
+world bounds
+start + goal positions
+static obstacle boxes
+dynamic obstacle trajectories (min0/max0 → min1/max1)
+```
+
+The saved JSON does NOT store the path. This allows experiments to be repeated with different planners.
+
+## 6. Requirements
+numpy
+plotly
