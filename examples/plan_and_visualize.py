@@ -35,12 +35,16 @@ from world.astar3d import astar_3d
 from viz.plotly_viz import visualize_scenario
 from world.schema import Scenario, Frame
 
+ENVIRONMENT_PATH = "environments/baseline_env.json"
+VIZ_PATH = "baseline_viz.html"
+
+
 def lerp(a, b, t):
     return tuple((1 - t) * np.array(a) + t * np.array(b))
 
 
 def main():
-    env = load_env_config("scenes/baseline_env.json")
+    env = load_env_config(ENVIRONMENT_PATH)
 
     bounds_min = env.bounds_min
     bounds_max = env.bounds_max
@@ -130,7 +134,7 @@ def main():
         title="Baseline: 3D A* Environment with Static (blue) and Dynamic (orange) Boxes",
     )
 
-    out = visualize_scenario(scn, outfile="baseline_viz.html")
+    out = visualize_scenario(scn, outfile=VIZ_PATH)
     print(f"Wrote {out} (open it in your browser).")
 
 

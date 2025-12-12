@@ -61,7 +61,7 @@ pip install -r requirements.txt
 ```
 
 ## 3. Running the Code
-### Step 1 — Generate an Environment (optional)
+### Step 1 (optional) — Generate an Environment
 
 This script creates the environment, writes a JSON config into the scenes/ folder, and also produces a preview visualization (viz.html).
 
@@ -75,7 +75,7 @@ scenes/baseline_env.json   # environment only
 viz.html                   # optional preview
 ```
 
-### Step 2 — Load Environment + Plan Path + Visualize (Main )
+### Step 2 (Main) — Load Environment + Plan Path + Visualize
 
 This script loads a saved JSON environment, runs a planner from start to goal, and outputs a full animation showing obstacles + trajectory + probe motion (from start to goal).
 
@@ -109,11 +109,11 @@ world/env_config.py
 world/env_io.py
 ```
 
-A saved file contains:
+A saved environement JSON file contains:
 
 ```
 world bounds
-start + goal positions
+start + goal locations
 static obstacle boxes
 dynamic obstacle trajectories (min0/max0 → min1/max1)
 ```
@@ -121,5 +121,7 @@ dynamic obstacle trajectories (min0/max0 → min1/max1)
 The saved JSON does NOT store the path. This allows experiments to be repeated with different planners.
 
 ## 6. Requirements
+```
 numpy
 plotly
+```

@@ -18,7 +18,7 @@ Optionally, the script also:
     computed path for visualization
 
 Output:
-  - scenes/baseline_env.json       (environment only, no frames or path)
+  - environments/baseline_env.json       (environment only, no frames or path)
   - viz.html                       (optional preview visualization)
 
 This script is mainly used only for designing or editing environments.
@@ -33,7 +33,7 @@ from viz.plotly_viz import visualize_scenario
 from world.env_config import EnvironmentConfig, DynBoxSpec
 from world.env_io import save_env_config
 
-ENV_SAVE_PATH = "scenes/baseline_env.json"
+ENV_SAVE_PATH = "environments/baseline_env.json"
 SAVE_VIZ = True  # set to False to skip visualization step
 VIZ_SAVE_PATH = "baseline_viz.html"
 
