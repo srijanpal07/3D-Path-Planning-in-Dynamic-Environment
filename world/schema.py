@@ -1,43 +1,33 @@
 from dataclasses import dataclass
-from typing import List, Tuple, Optional, Literal, Union
+from typing import List, Tuple
 
 Vec3 = Tuple[float, float, float]
+
 
 @dataclass
 class Box:
     min_corner: Vec3
     max_corner: Vec3
 
-@dataclass
-class Sphere:
-    center: Vec3
-    radius: float
-
-@dataclass
-class Cylinder:
-    base_center: Vec3   # center of the bottom face
-    axis: Vec3          # direction vector (will be normalized)
-    radius: float
-    height: float
-
-ObstacleKind = Literal["box", "sphere", "cylinder"]
-ObstacleParams = Union[Box, Sphere, Cylinder]
 
 @dataclass
 class Obstacle:
-    kind: ObstacleKind
-    params: ObstacleParams
-    dynamic: bool = False           # False => static color, True => dynamic color
-    name: str = ""                  # optional label
+    # We still keep a 'kind' string for readability / debugging, but it's always "box".
+    kind: str
+    params: Box
+    dynamic: bool = False   # False => static obstacle (blue), True => dynamic (orange)
+    name: str = ""          # optional label
+
 
 @dataclass
 class Frame:
     t: float
     obstacles: List[Obstacle]
     # Current planned path (polyline) from current probe position to goal
-    planned_path: Optional[List[Vec3]] = None
+    planned_path: List[Vec3] | None = None
     # Current probe position
-    probe: Optional[Vec3] = None
+    probe: Vec3 | None = None
+
 
 @dataclass
 class Scenario:

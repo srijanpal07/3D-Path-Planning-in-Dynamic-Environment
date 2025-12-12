@@ -88,11 +88,10 @@ def _obstacle_traces(ob: Obstacle) -> List:
 # ---------------------- markers & paths ----------------------
 
 def _start_goal_marker(p: Vec3, color: str, label: str) -> go.Scatter3d:
-    # make them big, lifted slightly above the ground, with text on top
     x, y, z = p
     z_lift = z + 0.2   # lift so it’s not buried in the grid
 
-    # Use symbols that are valid for 3D markers in your Plotly version
+    # Use symbols that are valid for 3D markers in Plotly
     if label.upper() == "START":
         symbol = "square-open"    # outlined square
     else:
@@ -103,7 +102,7 @@ def _start_goal_marker(p: Vec3, color: str, label: str) -> go.Scatter3d:
         mode="markers+text",
         name=label,
         marker=dict(
-            size=5,                 # big
+            size=5,
             symbol=symbol,
             color=color,
             line=dict(width=3, color="black"),
@@ -114,7 +113,6 @@ def _start_goal_marker(p: Vec3, color: str, label: str) -> go.Scatter3d:
         textfont=dict(color=color, size=18),
         showlegend=True,
     )
-
 
 
 def _probe_marker(p: Vec3) -> go.Scatter3d:
