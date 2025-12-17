@@ -11,7 +11,9 @@ START_COLOR    = "rgb(0, 200, 0)"      # green
 GOAL_COLOR     = "rgb(200, 0, 0)"      # red
 PROBE_COLOR    = "rgb(90, 0, 200)"     # purple
 PATH_COLOR     = "rgb(220, 0, 220)"    # magenta
-TAIL_COLOR     = "rgb(0, 120, 220)"    # blue
+TAIL_COLOR     = "rgb(0, 0, 0)"    # blue
+SENSOR_COLOR = "rgb(200,200,160,0.5)" # light grey-ish
+SENSOR_WIDTH = 2
 
 
 # ---------------------- bounds wireframe ----------------------
@@ -153,9 +155,62 @@ def _legend_line(color: str, name: str) -> go.Scatter3d:
         visible="legendonly",
     )
 
+
+def _sensor_wire_sphere(center: tuple[float, float, float],
+                        radius: float,
+                        n_theta: int = 24,
+                        n_phi: int = 12) -> list[go.Scatter3d]:
+    """
+    Returns a set of 3D line traces approximating a wireframe sphere.
+
+    - n_theta controls resolution around the circle (longitude)
+    - n_phi controls number of latitude rings
+    """
+    cx, cy, cz = center
+    traces: list[go.Scatter3d] = []
+
+    # Latitude rings (phi from 0..pi)
+    phis = np.linspace(0.15*np.pi, 0.85*np.pi, n_phi)  # skip poles to avoid clutter
+    thetas = np.linspace(0, 2*np.pi, n_theta)
+
+    for phi in phis:
+        x = cx + radius * np.sin(phi) * np.cos(thetas)
+        y = cy + radius * np.sin(phi) * np.sin(thetas)
+        z = cz + radius * np.cos(phi) * np.ones_like(thetas)
+
+        traces.append(go.Scatter3d(
+            x=x, y=y, z=z,
+            mode="lines",
+            line=dict(color=SENSOR_COLOR, width=SENSOR_WIDTH),
+            name="sensor",
+            showlegend=False,
+            hoverinfo="skip",
+        ))
+
+    # A few longitude rings (vertical great circles)
+    longitudes = [0.0, 0.5*np.pi, np.pi/4, 3*np.pi/4]
+    phis2 = np.linspace(0, np.pi, n_theta)
+
+    for theta0 in longitudes:
+        x = cx + radius * np.sin(phis2) * np.cos(theta0)
+        y = cy + radius * np.sin(phis2) * np.sin(theta0)
+        z = cz + radius * np.cos(phis2)
+
+        traces.append(go.Scatter3d(
+            x=x, y=y, z=z,
+            mode="lines",
+            line=dict(color=SENSOR_COLOR, width=SENSOR_WIDTH),
+            name="sensor",
+            showlegend=False,
+            hoverinfo="skip",
+        ))
+
+    return traces
+
+
 # ---------------------- main entry ----------------------
 
-def visualize_scenario(scn: Scenario, outfile: str = "viz.html") -> str:
+def visualize_scenario(scn: Scenario, outfile: str = "viz.html", sensor_radius: float | None = 0.25) -> str:
     frames = []
     probe_tail: List[Vec3] = []
 
@@ -183,6 +238,8 @@ def visualize_scenario(scn: Scenario, outfile: str = "viz.html") -> str:
             probe_tail.append(fr.probe)
             frame_traces.append(_path_trace(probe_tail, TAIL_COLOR, "Traversed Trajectory", width=2))
             frame_traces.append(_probe_marker(fr.probe))
+            if sensor_radius is not None and fr.probe is not None:
+                frame_traces.extend(_sensor_wire_sphere(fr.probe, sensor_radius))
 
         frames.append(go.Frame(data=frame_traces, name=f"{fr.t:.2f}s"))
 
