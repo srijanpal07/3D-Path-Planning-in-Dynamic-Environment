@@ -1,12 +1,17 @@
+"""
+online_astar.py
+"""
+
 from __future__ import annotations
 from typing import List, Tuple, Optional
 import numpy as np
+
 from world.env_io import load_env_config
 from world.schema import Obstacle, Box, Scenario, Frame, Vec3
 from world.grid_world import build_grid_from_env, GridWorld
+from world.geometry_utils import mark_box_on_mask, aabb_point_distance, lerp, make_grid_with_mask
 from planners.astar3d import astar_3d
 from viz.plotly_viz import visualize_scenario
-from examples.geometry_utils import mark_box_on_mask, aabb_point_distance, lerp, make_grid_with_mask
 
 
 # -------- CONFIGURABLE PARAMETERS --------
@@ -43,7 +48,18 @@ def normalize_path(idx_path, start_idx, goal_idx):
 
 
 def run_online_astar(env_path: str,outfile: str, sensor_radius: float=0.5) -> None:
-    print("Running online A* replanning with local sensing...")    
+    """
+    Docstring for run_online_astar
+    
+    :param env_path: Description
+    :type env_path: str
+    :param outfile: Description
+    :type outfile: str
+    :param sensor_radius: Description
+    :type sensor_radius: float
+    """
+    print("Running online A* with known static obstacles and local sensing based replanning for dynamic obstacles...")
+    print(f"Sensor radius is set to: {sensor_radius} m")   
     env = load_env_config(env_path)
     dt= DT
     n_frames = N_FRAMES
@@ -52,6 +68,8 @@ def run_online_astar(env_path: str,outfile: str, sensor_radius: float=0.5) -> No
     lookahead_cells = LOOKAHEAD_CELLS
     move_every = MOVE_EVERY
     resolution = RESOLUTION
+    outfile = outfile.split(".html")[0] + "_online.html"
+    
 
     bounds_min = env.bounds_min
     bounds_max = env.bounds_max
@@ -141,7 +159,7 @@ def run_online_astar(env_path: str,outfile: str, sensor_radius: float=0.5) -> No
                 if not planning_grid.is_free(goal_idx):
                     print("DEBUG: goal cell is occupied under current sensed mask!", goal_idx)
 
-                current_idx_path = astar_3d(planning_grid, probe_idx, goal_idx)
+                current_idx_path = astar_3d(planning_grid, probe_idx, goal_idx, neighbors=26)
                 current_idx_path = normalize_path(current_idx_path, probe_idx, goal_idx)
                 path_cursor = 0
 
@@ -204,6 +222,5 @@ def run_online_astar(env_path: str,outfile: str, sensor_radius: float=0.5) -> No
         title="Online replanning A*: Known static obstacles + dynamic obstacles sensed locally",
     )
 
-    # Show sensor in viz (as a sphere around the probe)
     out = visualize_scenario(scn, outfile=outfile, sensor_radius=sensor_radius)
-    print(f"Wrote {out} (open it in your browser).")
+    print(f"Saved {out} in the root directory. To visualize simulation, open {out} in your browser.")

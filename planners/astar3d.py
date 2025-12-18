@@ -14,7 +14,7 @@ def _heuristic(idx: Idx3, goal: Idx3, grid: GridWorld) -> float:
     return math.sqrt(dx * dx + dy * dy + dz * dz)
 
 
-def astar_3d(grid: GridWorld, start: Idx3, goal: Idx3) -> List[Idx3]:
+def astar_3d(grid: GridWorld, start: Idx3, goal: Idx3, neighbors: int = 26) -> List[Idx3]:
     """
     3D A* on a GridWorld with 6-connected or 26-connected neighbors.
 
@@ -54,27 +54,26 @@ def astar_3d(grid: GridWorld, start: Idx3, goal: Idx3) -> List[Idx3]:
             found = True
             break
 
-        # Explore 6-connected neighbors (Uncomment to use 6-connected)
-        # for nbr in grid.neighbors6(current):
-        #     step_cost = grid.resolution  # all 6 moves are axis-aligned
-        #     tentative_g = g + step_cost
-
-        #     if tentative_g < g_cost.get(nbr, float("inf")):
-        #         g_cost[nbr] = tentative_g
-        #         parent[nbr] = current
-        #         f_new = tentative_g + _heuristic(nbr, goal, grid)
-        #         heapq.heappush(open_heap, (f_new, tentative_g, nbr))
-
-        # Explore 26-connected neighbors
-        for nbr in grid.neighbors26(current):
-            step_cost = grid.resolution  # all 26 moves are axis-aligned
-            tentative_g = g + step_cost
-
-            if tentative_g < g_cost.get(nbr, float("inf")):
-                g_cost[nbr] = tentative_g
-                parent[nbr] = current
-                f_new = tentative_g + _heuristic(nbr, goal, grid)
-                heapq.heappush(open_heap, (f_new, tentative_g, nbr))
+        if neighbors == 6:
+            # Explore 6-connected neighbors
+            for nbr in grid.neighbors6(current):
+                step_cost = grid.resolution  # all 6 moves are axis-aligned
+                tentative_g = g + step_cost
+                if tentative_g < g_cost.get(nbr, float("inf")):
+                    g_cost[nbr] = tentative_g
+                    parent[nbr] = current
+                    f_new = tentative_g + _heuristic(nbr, goal, grid)
+                    heapq.heappush(open_heap, (f_new, tentative_g, nbr))
+        else:
+            # Explore 26-connected neighbors
+            for nbr in grid.neighbors26(current):
+                step_cost = grid.resolution
+                tentative_g = g + step_cost
+                if tentative_g < g_cost.get(nbr, float("inf")):
+                    g_cost[nbr] = tentative_g
+                    parent[nbr] = current
+                    f_new = tentative_g + _heuristic(nbr, goal, grid)
+                    heapq.heappush(open_heap, (f_new, tentative_g, nbr))
 
     if not found:
         raise RuntimeError("A*: no path found from start to goal.")

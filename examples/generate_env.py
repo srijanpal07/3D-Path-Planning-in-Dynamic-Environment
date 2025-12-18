@@ -13,8 +13,8 @@ It then saves this environment to a reusable JSON file using EnvironmentConfig.
 
 Optionally, the script also:
   - builds a 3D occupancy grid
-  - computes a baseline 3D A* path
-  - generates a Scenario with interpolated dynamic obstacles and the
+  - computes a offline 3D A* path
+  - generates a Scenario with obstacles and the
     computed path for visualization
 
 Output:
@@ -28,16 +28,17 @@ It does NOT need to be run when evaluating planners.
 import numpy as np
 from world.schema import Scenario, Frame, Obstacle, Box
 from world.grid_world import build_grid_from_env
-from world.astar3d import astar_3d
-from viz.plotly_viz import visualize_scenario
 from world.env_config import EnvironmentConfig, DynBoxSpec
 from world.env_io import save_env_config
+from planners.astar3d import astar_3d
+from viz.plotly_viz import visualize_scenario
+
 
 #---------------------- Parameters ----------------------
-ENV_SAVE_PATH = "environments/baseline_env2.json"
+ENV_SAVE_PATH = "environments/env3.json"
 VIZ_TITLE = "Baseline: 3D A* Environment with Static (blue) and Dynamic (orange) Boxes"
 SAVE_VIZ = True  # set to False to skip visualization step
-VIZ_SAVE_PATH = "baseline_viz3.html"
+VIZ_SAVE_PATH = "baseline_viz.html"
 #--------------------------------------------------------
 
 
@@ -52,7 +53,7 @@ def main():
 
     # ---------- START & GOAL ----------
     start = (1.0, 1.0, 1.0)
-    goal  = (7.2, 6.0, 1.8) #(9.0, 9.0, 3.0) # (4.5, 3.0, 1.0) # (9.0, 9.0, 3.0)
+    goal  = (9.0, 9.0, 3.0) # near: (4.5, 3.0, 1.0) # mid: (7.2, 6.0, 1.8) # far: (9.0, 9.0, 3.0) 
 
     # ---------- STATIC BOXES ----------
     static_boxes = [
@@ -210,9 +211,10 @@ def main():
             title=VIZ_TITLE,
         )
 
-
+        print("\nSaving an example visualization on the saved environment with offline astar planner...")
         out = visualize_scenario(scn, outfile=VIZ_SAVE_PATH)
-        print(f"Wrote {out} (open it in your browser).")
+        print(f"Saved \"{out}\" in the root directory.")
+        print(f"To visualize simulation, open \"{out}\" in your browser.\n")
 
 
 if __name__ == "__main__":
