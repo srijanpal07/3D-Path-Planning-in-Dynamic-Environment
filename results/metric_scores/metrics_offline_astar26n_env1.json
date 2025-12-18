@@ -2,6 +2,6 @@
   "planner": "Offline A* (26 neighbors)",
   "success": true,
   "failure_reason": null,
-  "planning_time_s": 0.01055450295098126,
+  "planning_time_s": 0.005705065035726875,
   "path_length_m": 5.548005919123904
 }

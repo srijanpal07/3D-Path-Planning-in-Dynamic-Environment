@@ -15,11 +15,10 @@ Notes:
 
 from __future__ import annotations
 import argparse
-from typing import List, Optional, Dict, Any
+from typing import List, Optional
 import time
 from dataclasses import dataclass, asdict
 import json
-import os
 
 from world.env_io import load_env_config
 from world.schema import Obstacle, Box, Scenario, Frame
@@ -156,9 +155,7 @@ def run_offline_astar(env_path: str, outfile: str, neighbors: int = 26) -> None:
     print("================================\n")
 
     # Save metrics to JSON
-    metric_scores_dir = "results/metric_scores"
-    metric_scores_file = f"{metric_scores_dir}/metrics_offline_astar{neighbors}n_{env_name}.json"
-    os.makedirs(metric_scores_dir, exist_ok=True)
+    metric_scores_file = f"metrics_offline_astar{neighbors}n_{env_name}.json"
     with open(metric_scores_file, "w") as f:
         json.dump(asdict(metrics), f, indent=2)
     print(f"Saved metric scores to \"{metric_scores_file}\"")
