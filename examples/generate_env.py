@@ -37,7 +37,7 @@ from world.env_io import save_env_config
 ENV_SAVE_PATH = "environments/baseline_env2.json"
 VIZ_TITLE = "Baseline: 3D A* Environment with Static (blue) and Dynamic (orange) Boxes"
 SAVE_VIZ = True  # set to False to skip visualization step
-VIZ_SAVE_PATH = "baseline_viz2.html"
+VIZ_SAVE_PATH = "baseline_viz3.html"
 #--------------------------------------------------------
 
 
@@ -52,7 +52,7 @@ def main():
 
     # ---------- START & GOAL ----------
     start = (1.0, 1.0, 1.0)
-    goal  = (4.5, 3.0, 1.0) # (9.0, 9.0, 3.0)
+    goal  = (7.2, 6.0, 1.8) #(9.0, 9.0, 3.0) # (4.5, 3.0, 1.0) # (9.0, 9.0, 3.0)
 
     # ---------- STATIC BOXES ----------
     static_boxes = [
