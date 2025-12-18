@@ -1,0 +1,7 @@
+{
+  "planner": "Online A* (replanning, static known + local sensing)",
+  "success": true,
+  "failure_reason": null,
+  "planning_time_s": 0.002896942023653537,
+  "path_length_m": 9.559445745762313
+}

@@ -5,6 +5,9 @@ online_astar.py
 from __future__ import annotations
 from typing import List, Tuple, Optional
 import numpy as np
+import time, json, os
+from dataclasses import dataclass, asdict
+from typing import Optional
 
 from world.env_io import load_env_config
 from world.schema import Obstacle, Box, Scenario, Frame, Vec3
@@ -24,6 +27,34 @@ RESOLUTION = 0.25         # Grid resolution (m)
 # ----------------------------------------
 
 
+# ------------------------------
+# Metrics dataclass and utility
+# ------------------------------
+@dataclass
+class PlannerMetrics:
+    planner: str
+    success: bool
+    failure_reason: Optional[str]
+    planning_time_s: float
+    path_length_m: float
+
+
+def path_length(world_path) -> float:
+    """Sum of Euclidean distances along a list of 3D points."""
+    if not world_path or len(world_path) < 2:
+        return 0.0
+    dist = 0.0
+    for a, b in zip(world_path[:-1], world_path[1:]):
+        dx = b[0] - a[0]
+        dy = b[1] - a[1]
+        dz = b[2] - a[2]
+        dist += (dx*dx + dy*dy + dz*dz) ** 0.5
+    return dist
+
+
+# ------------------------------
+# Online planning utilities
+# ------------------------------
 def path_blocked(planning_grid: GridWorld, idx_path: List[Tuple[int, int, int]], start_i: int, lookahead: int) -> bool:
     """
     Check if any of the next `lookahead` cells on a path are occupied.
@@ -58,9 +89,12 @@ def run_online_astar(env_path: str,outfile: str, sensor_radius: float=0.5) -> No
     :param sensor_radius: Description
     :type sensor_radius: float
     """
+    print("Evironment used for planning:", env_path)
     print("Running online A* with known static obstacles and local sensing based replanning for dynamic obstacles...")
-    print(f"Sensor radius is set to: {sensor_radius} m")   
+    print(f"Sensor radius is set to: {sensor_radius} m")
+
     env = load_env_config(env_path)
+    env_name = (env_path.split('/')[-1]).split('.json')[0]
     dt= DT
     n_frames = N_FRAMES
     sensor_radius = sensor_radius
@@ -68,8 +102,14 @@ def run_online_astar(env_path: str,outfile: str, sensor_radius: float=0.5) -> No
     lookahead_cells = LOOKAHEAD_CELLS
     move_every = MOVE_EVERY
     resolution = RESOLUTION
-    outfile = outfile.split(".html")[0] + "_online.html"
-    
+    if outfile is None:
+        outfile = f"viz_online_astar_{env_name}.html"
+
+    env_name = (env_path.split('/')[-1]).split('.json')[0]
+
+    total_planning_time_s = 0.0   # sum of A* calls only
+    failure_reason = None
+    success = False
 
     bounds_min = env.bounds_min
     bounds_max = env.bounds_max
@@ -138,7 +178,7 @@ def run_online_astar(env_path: str,outfile: str, sensor_radius: float=0.5) -> No
 
         # If goal becomes blocked, stop early
         if not planning_grid.is_free(goal_idx):
-            print("Goal became blocked under current sensed obstacles; stopping.")
+            failure_reason = "Goal became blocked under current sensed obstacles."
             break
 
         # Replan conditions
@@ -159,7 +199,10 @@ def run_online_astar(env_path: str,outfile: str, sensor_radius: float=0.5) -> No
                 if not planning_grid.is_free(goal_idx):
                     print("DEBUG: goal cell is occupied under current sensed mask!", goal_idx)
 
+                t_plan0 = time.perf_counter()
                 current_idx_path = astar_3d(planning_grid, probe_idx, goal_idx, neighbors=26)
+                total_planning_time_s += time.perf_counter() - t_plan0
+
                 current_idx_path = normalize_path(current_idx_path, probe_idx, goal_idx)
                 path_cursor = 0
 
@@ -167,6 +210,7 @@ def run_online_astar(env_path: str,outfile: str, sensor_radius: float=0.5) -> No
                 print("Online replanning: replanner crashed:", repr(e))
                 print("probe_idx free?", planning_grid.is_free(probe_idx), "probe_idx=", probe_idx)
                 print("goal_idx  free?", planning_grid.is_free(goal_idx),  "goal_idx=", goal_idx)
+                failure_reason = f"Replanner crashed: {repr(e)}"
                 break
 
         # Planned path for visualization (world coords)
@@ -183,16 +227,18 @@ def run_online_astar(env_path: str,outfile: str, sensor_radius: float=0.5) -> No
                 planned_path=[],
                 probe=probe_world,
             ))
+            success = True
+            failure_reason = None
             break
 
         if current_idx_path is None or len(current_idx_path) == 0:
-            print("No path returned; stopping.")
+            failure_reason = "No path returned."
             break
 
         # Move one step forward along the current plan
         # (current_idx_path[path_cursor] is where we are supposed to be now)
         if current_idx_path is None or len(current_idx_path) == 0:
-            print("No path returned; stopping.")
+            failure_reason = "No path returned."
             break
 
         # Ensure cursor is in range
@@ -213,6 +259,33 @@ def run_online_astar(env_path: str,outfile: str, sensor_radius: float=0.5) -> No
             probe=probe_world,
         ))
 
+    dist_m = path_length(executed_world)
+    metrics = PlannerMetrics(
+        planner="Online A* (replanning, static known + local sensing)",
+        success=success,
+        failure_reason=failure_reason,
+        planning_time_s=total_planning_time_s,
+        path_length_m=dist_m,
+    )
+
+    # Print metrics
+    print("\n======= PLANNER METRICS =======")
+    print(f"Planner           : {metrics.planner}")
+    print(f"Success           : {metrics.success}")
+    if not metrics.success:
+        print(f"Failure reason    : {metrics.failure_reason}")
+    else:
+        print("Failure reason    : None")
+    print(f"Planning time     : {metrics.planning_time_s:.6f} s")
+    print(f"Path length       : {metrics.path_length_m:.4f} m")
+    print("================================\n")
+
+    # Save metrics to JSON
+    metric_scores_file = f"metrics_online_astar_{env_name}.json"
+    with open(metric_scores_file, "w") as f:
+        json.dump(asdict(metrics), f, indent=2)
+    print(f"Saved metric scores to \"{metric_scores_file}\"")
+
     scn = Scenario(
         bounds_min=bounds_min,
         bounds_max=bounds_max,
@@ -222,5 +295,8 @@ def run_online_astar(env_path: str,outfile: str, sensor_radius: float=0.5) -> No
         title="Online replanning A*: Known static obstacles + dynamic obstacles sensed locally",
     )
 
+    print("\n======== VISUALIZATION =========")
     out = visualize_scenario(scn, outfile=outfile, sensor_radius=sensor_radius)
-    print(f"Saved {out} in the root directory. To visualize simulation, open {out} in your browser.")
+    print(f"Saved \"{out}\" in the root directory.")
+    print(f"To visualize simulation, open \"{out}\" in your browser.")
+    print("================================\n")
