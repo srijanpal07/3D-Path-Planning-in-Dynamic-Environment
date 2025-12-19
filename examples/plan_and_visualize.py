@@ -26,6 +26,7 @@ from world.grid_world import build_grid_from_env
 from world.geometry_utils import lerp
 from planners.astar3d import astar_3d
 from planners.online_astar import run_online_astar
+from planners.dstar_lite import run_online_dstar
 from viz.plotly_viz import visualize_scenario
 
 
@@ -34,7 +35,7 @@ DT = 0.1                  # Frame timestep (seconds)
 N_FRAMES = 120            # Number of frames to generate
 INFLATION_CELLS = 1       # Inflation (grid cells) for sensed dynamic obstacles.
 LOOKAHEAD_CELLS = 10      # Replan if any of next L path cells become blocked.
-MOVE_EVERY = 3            # how often to move the probe along the planned path (move once every 3 frames, increase to slow more)
+MOVE_EVERY = 1            # how often to move the probe along the planned path (move once every 3 frames, increase to slow more)
 RESOLUTION = 0.25         # Grid resolution (m)
 # ----------------------------------------
 
@@ -104,9 +105,6 @@ def run_offline_astar(env_path: str, outfile: str, neighbors: int = 26) -> None:
 
     start_idx = grid.world_to_grid(start)
     goal_idx = grid.world_to_grid(goal)
-
-    # idx_path = astar_3d(grid, start_idx, goal_idx)
-    # world_path = [grid.grid_to_world(idx) for idx in idx_path]
 
     t0 = time.perf_counter()    # METRICS: planning time + success/failure
     idx_path = None
@@ -210,18 +208,18 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--env", type=str, default="environments/env3.json", help="Path to environment JSON (EnvironmentConfig).")
     parser.add_argument("--outfile", type=str, default=None,help="Output HTML file.")
-    parser.add_argument("--planner", type=str, default="offline_astar", choices=["offline_astar", "online_astar"], help="Planner mode: offline_astar (fully known) or online_astar (partially known).")
+    parser.add_argument("--planner", type=str, default="offline_astar", choices=["offline_astar", "online_astar", "online_dstar"], help="Planner mode: offline_astar (fully known) or online_astar (partially known).")
     parser.add_argument("--neighbors", type=int, default=26, choices=[6, 26], help="Number of neighbors for A* (26 or 6) [only for offline planning].")
     parser.add_argument("--sensor-radius", type=float, default=0.5, help="Sensor radius (m) for discovering dynamic obstacles [only for online replanning].") 
     args = parser.parse_args()
 
     if args.planner == "offline_astar":
         run_offline_astar(args.env, args.outfile, neighbors=args.neighbors)
-    else:
-        run_online_astar(
-            args.env, args.outfile,
-            sensor_radius=args.sensor_radius,
-            )
+    elif args.planner == "online_astar":
+        run_online_astar(args.env, args.outfile, sensor_radius=args.sensor_radius)
+    elif args.planner == "online_dstar":
+        print("Online D* is not implemented yet.")
+        # run_online_dstar(args.env, args.outfile, sensor_radius=args.sensor_radius)
 
 
 if __name__ == "__main__":

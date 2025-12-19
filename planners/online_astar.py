@@ -19,7 +19,7 @@ from viz.plotly_viz import visualize_scenario
 
 # -------- CONFIGURABLE PARAMETERS --------
 DT = 0.1                  # Frame timestep (seconds)
-N_FRAMES = 120            # Number of frames to generate
+N_FRAMES = 230            # Number of frames to generate
 INFLATION_CELLS = 1       # Inflation (grid cells) for sensed dynamic obstacles.
 LOOKAHEAD_CELLS = 10      # Replan if any of next L path cells become blocked.
 MOVE_EVERY = 3            # how often to move the probe along the planned path (move once every 3 frames, increase to slow more)
@@ -37,6 +37,7 @@ class PlannerMetrics:
     failure_reason: Optional[str]
     planning_time_s: float
     path_length_m: float
+    num_replans: int
 
 
 def path_length(world_path) -> float:
@@ -108,6 +109,7 @@ def run_online_astar(env_path: str,outfile: str, sensor_radius: float=0.5) -> No
     env_name = (env_path.split('/')[-1]).split('.json')[0]
 
     total_planning_time_s = 0.0   # sum of A* calls only
+    n_replans = 0
     failure_reason = None
     success = False
 
@@ -202,6 +204,7 @@ def run_online_astar(env_path: str,outfile: str, sensor_radius: float=0.5) -> No
                 t_plan0 = time.perf_counter()
                 current_idx_path = astar_3d(planning_grid, probe_idx, goal_idx, neighbors=26)
                 total_planning_time_s += time.perf_counter() - t_plan0
+                n_replans += 1
 
                 current_idx_path = normalize_path(current_idx_path, probe_idx, goal_idx)
                 path_cursor = 0
@@ -266,6 +269,7 @@ def run_online_astar(env_path: str,outfile: str, sensor_radius: float=0.5) -> No
         failure_reason=failure_reason,
         planning_time_s=total_planning_time_s,
         path_length_m=dist_m,
+        num_replans=n_replans,
     )
 
     # Print metrics
@@ -278,6 +282,7 @@ def run_online_astar(env_path: str,outfile: str, sensor_radius: float=0.5) -> No
         print("Failure reason    : None")
     print(f"Planning time     : {metrics.planning_time_s:.6f} s")
     print(f"Path length       : {metrics.path_length_m:.4f} m")
+    print(f"Number of replans : {n_replans}")
     print("================================\n")
 
     # Save metrics to JSON

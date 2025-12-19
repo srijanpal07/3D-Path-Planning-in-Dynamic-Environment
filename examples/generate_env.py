@@ -34,11 +34,13 @@ from planners.astar3d import astar_3d
 from viz.plotly_viz import visualize_scenario
 
 
-#---------------------- Parameters ----------------------
-ENV_SAVE_PATH = "environments/env3.json"
-VIZ_TITLE = "Baseline: 3D A* Environment with Static (blue) and Dynamic (orange) Boxes"
+#---------------------- Configurable Parameters ----------------------
+START = (1.0, 1.0, 1.0)
+GOAL  = (9.0, 9.0, 3.0) # near: (4.5, 3.0, 1.0) # mid: (7.2, 6.0, 1.8) # far: (9.0, 9.0, 3.0) 
+ENV_SAVE_PATH = "environments/env_new.json"
+VIZ_TITLE = "Baseline: 3D A* Environment with Static (blue) and Dynamic (orange) Obstacles"
 SAVE_VIZ = True  # set to False to skip visualization step
-VIZ_SAVE_PATH = "baseline_viz.html"
+VIZ_SAVE_PATH = "baseline_viz.html" # Name and path for the output visualization HTML file
 #--------------------------------------------------------
 
 
@@ -52,8 +54,8 @@ def main():
     bounds_max = (10.0, 10.0, 5.0)
 
     # ---------- START & GOAL ----------
-    start = (1.0, 1.0, 1.0)
-    goal  = (9.0, 9.0, 3.0) # near: (4.5, 3.0, 1.0) # mid: (7.2, 6.0, 1.8) # far: (9.0, 9.0, 3.0) 
+    start = START
+    goal  = GOAL
 
     # ---------- STATIC BOXES ----------
     static_boxes = [

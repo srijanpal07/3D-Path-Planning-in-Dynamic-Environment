@@ -1,2 +1,2 @@
-numpy
-plotly
+numpy==2.2.6
+plotly==6.3.1
