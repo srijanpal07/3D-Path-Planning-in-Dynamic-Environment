@@ -43,27 +43,27 @@ The system produces interactive 3D visualizations and quantitative metrics for e
 3D-Path-Planning-in-Dynamic-Environment/
 |
 ├── environments/
-|   ├── *.json                   # Saved environments (static + dynamic obstacles)
+|   ├── *.json                   # saved environments (static + dynamic obstacles)
 │
-├── examples/
+├── examples/                    # core modules
 │   ├── generate_env.py          # create environment + save + preview visualization
 |   ├── generate_env_complex.py  # same as generate_env.py but creates more complex environment
-│   ├── plan_and_visualize.py    # Main entry point: load an environment + run planner + animate visualization
+│   ├── plan_and_visualize.py    # main entry point: load an environment + run planner + animate visualization
 |
 ├── planners/
 │   ├── astar3d.py               # Offline 3D A* with 6/26 neighbors
 │   ├── online_astar.py          # Online A* with local sensing and replanning
-│   ├── dstar_lite.py            # Online D* Lite (incremental replanning)
+│   ├── dstar_lite.py            # Online D* lite (incremental replanning)
 │
 ├── world/
-│   ├── schema.py                # Obstacle, Frame, Scenario dataclasses
+│   ├── schema.py                # obstacle, Frame, Scenario dataclasses
 │   ├── env_config.py            # EnvironmentConfig dataclass
-│   ├── env_io.py                # JSON save/load utilities
+│   ├── env_io.py                # json save/load utilities
 │   ├── grid_world.py            # 3D occupancy grid
-│   ├── geometry_utils.py        # 
+│   ├── geometry_utils.py        
 │
 ├── viz/
-│   ├── plotly_viz.py            # Plotly rendering of 3D Scenario
+│   ├── plotly_viz.py            # plotly rendering of 3D Scenario
 │
 ├── results/                     
 │   ├── visualizations           # generated visualizations (HTMLs)
