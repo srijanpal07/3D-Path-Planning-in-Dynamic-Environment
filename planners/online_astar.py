@@ -19,11 +19,12 @@ from viz.plotly_viz import visualize_scenario
 
 # -------- CONFIGURABLE PARAMETERS --------
 DT = 0.1                  # Frame timestep (seconds)
-N_FRAMES = 230            # Number of frames to generate
+N_FRAMES = 230            # Number of frames to generate: use 120 for env1, 2 and 3 and use 230 for env_complex            
 INFLATION_CELLS = 1       # Inflation (grid cells) for sensed dynamic obstacles.
 LOOKAHEAD_CELLS = 10      # Replan if any of next L path cells become blocked.
-MOVE_EVERY = 3            # how often to move the probe along the planned path (move once every 3 frames, increase to slow more)
 RESOLUTION = 0.25         # Grid resolution (m)
+MOVE_EVERY = 3            # how often to move the probe along the planned path (move once every 3 frames, increase to slow more)
+                          # might have to change depending on the env complexity
 # ----------------------------------------
 
 

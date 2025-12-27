@@ -112,7 +112,7 @@ metrics_{planner}_{environment}.json   # metric scores
 ```
 Open the .html file in any browser to view the scene and .json file to get the score metrics.
 
-### Step 4 (Optional): Generate an Environment
+### Step 4 (Optional): Generate an environment
 Generate a new 3D environment with static and dynamic obstacles and save it as a JSON file:
 ```
 python -m examples.generate_env
@@ -138,6 +138,28 @@ and probe movement.
 - **Planning Time (seconds)**: Offline A*: single-shot planning time; Online planners: total time accumulated across all replanning steps
 - **Path Length (meters)**: Total distance traveled by the probe
 - **Number of Replans** (online planners only): Counts how many times replanning was triggered due to sensing
+
+
+### Example Visualizations
+
+<div align="center">
+  <table>
+    <tr>
+      <td align="center">
+        <img src="docs/results/gif_offline_astar_env2.gif" width="320"><br>
+        <b>Offline A* (Environment 2)</b>
+      </td>
+      <td align="center">
+        <img src="docs/results/gif_online_astar_env1.gif" width="290"><br>
+        <b>Online A* (Environment 1)</b>
+      </td>
+      <td align="center">
+        <img src="docs/results/gif_online_astar_env_complex.gif" width="320"><br>
+        <b>Online A* (Complex Environment)</b>
+      </td>
+    </tr>
+  </table>
+</div>
 
 
 ## Requirements
